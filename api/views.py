@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse,redirect,get_object_or_404,reverse
-from .forms import StaticForm, DynamicForm
-from .models import staticQR,dynamicQR
+from .forms import StaticForm, DynamicForm,VcardForm
+from .models import staticQR,dynamicQR,Vcard
 import requests
 import json
 def apistatic(request):
@@ -89,6 +89,63 @@ def apidynamic(request):
     return render(request,"dynamicqr.html",{'name' : name,
                                             'url' : url})
 
+
+
+def apivcard(request):
+    v = Vcard.objects.all()
+    V = v[len(v)-1]
+
+    url = "https://api.beaconstac.com/api/2.0/qrcodes/"
+    p = {
+        "name": V.name,
+        "qr_type": V.qr_type,
+        "organization": V.organization,
+        "attributes": {
+            "color": "#fb6e6e",
+            "margin": 25
+        },
+        "campaign": {
+            "content_type": V.content_type,
+            "vcard_plus": {
+                "first_name": V.first_name,
+                "last_name": V.last_name,
+                "user_image_url": V.user_image_url,
+                "phone": {
+                    "mobile": V.phone_mobile
+                },
+                "email": V.email,
+                "customizations": {
+                    "background_color": "#2594FF",
+                    "user_info_color": "#FFFFFF"
+                }
+            }
+        }
+    }
+    payload = json.dumps(p)
+    headers = {
+    'Authorization': 'Token '+ V.auth_token,
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data = payload)
+    result = response.json()
+    qr_id = result['id']
+    params = (
+    ('canvas_type', 'png'),
+    )
+    headers2 = {
+    'Authorization': 'Token '+ V.auth_token
+    }
+    response2 = requests.get('https://api.beaconstac.com/api/2.0/qrcodes/'+str(qr_id)+'/download/', params=params,headers=headers2)
+    image_data = response2.json()
+    name = image_data['name']
+    url = image_data['urls']['png']
+    V.qr_id = qr_id
+    V.qr_url = url
+    return render(request,"vcardqr.html",{'name' : name,
+                                            'url' : url})
+
+
 def addStatic(request):
     form = StaticForm(request.POST or None,request.FILES or None)
 
@@ -110,3 +167,13 @@ def addDynamic(request):
 
         return redirect("api:apidynamic")
     return render(request,"adddynamic.html",{"form":form})
+
+def addVcard(request):
+    form = VcardForm(request.POST or None,request.FILES or None)
+
+    if form.is_valid():
+        vcardqr = form.save(commit=False)
+        vcardqr.save()
+
+        return redirect("api:apivcard")
+    return render(request,"addvcard.html",{"form":form})
