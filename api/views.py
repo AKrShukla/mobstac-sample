@@ -29,8 +29,21 @@ def apistatic(request):
 
     response = requests.request("POST", url, headers=headers, data = payload)
     result = response.json()
-    
-    return render(request,"staticqr.html",result)
+    qr_id = result['id']
+    params = (
+    ('canvas_type', 'png'),
+    )
+    headers2 = {
+    'Authorization': 'Token '+ S.auth_token
+    }
+    response2 = requests.get('https://api.beaconstac.com/api/2.0/qrcodes/'+str(qr_id)+'/download/', params=params,headers=headers2)
+    image_data = response2.json()
+    name = image_data['name']
+    url = image_data['urls']['png']
+    S.qr_id = qr_id
+    S.qr_url = url
+    return render(request,"staticqr.html",{'name' : name,
+                                            'url' : url})
 
 
 
@@ -60,8 +73,21 @@ def apidynamic(request):
 
     response = requests.request("POST", url, headers=headers, data = payload)
     result = response.json()
-
-    return render(request,"dynamicqr.html",result)
+    qr_id = result['id']
+    params = (
+    ('canvas_type', 'png'),
+    )
+    headers2 = {
+    'Authorization': 'Token '+ D.auth_token
+    }
+    response2 = requests.get('https://api.beaconstac.com/api/2.0/qrcodes/'+str(qr_id)+'/download/', params=params,headers=headers2)
+    image_data = response2.json()
+    name = image_data['name']
+    url = image_data['urls']['png']
+    D.qr_id = qr_id
+    D.qr_url = url
+    return render(request,"dynamicqr.html",{'name' : name,
+                                            'url' : url})
 
 def addStatic(request):
     form = StaticForm(request.POST or None,request.FILES or None)
