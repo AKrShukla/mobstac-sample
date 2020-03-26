@@ -7,7 +7,7 @@ from ckeditor.fields import RichTextField
 class staticQR(models.Model):
     auth_token = '82f46feaee08dd185dac1adcef06f8b5b381c75f'
     name = models.CharField(max_length = 50,verbose_name = "Name")
-    qr_type = models.CharField(max_length = 50,verbose_name = "qr_type")
+    qr_type = 1
     organization = 5419
     url = models.CharField(max_length = 400,verbose_name = "Url")
     qr_url = None
@@ -21,7 +21,7 @@ class staticQR(models.Model):
 class dynamicQR(models.Model):
     auth_token = '82f46feaee08dd185dac1adcef06f8b5b381c75f'
     name = models.CharField(max_length = 50,verbose_name = "Name")
-    qr_type = models.CharField(max_length = 50,verbose_name = "qr_type")
+    qr_type = 2
     organization = 5419
     content_type = 1
     custom_url = models.CharField(max_length = 400,verbose_name = "Url")

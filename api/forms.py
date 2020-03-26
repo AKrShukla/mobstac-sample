@@ -3,9 +3,9 @@ from .models import staticQR,dynamicQR
 class StaticForm(forms.ModelForm):
     class Meta:
         model = staticQR
-        fields = ["name","qr_type","url"]
+        fields = ["name","url"]
 class DynamicForm(forms.ModelForm):
     class Meta:
         model = dynamicQR
-        fields = ["name","qr_type","custom_url"]
+        fields = ["name","custom_url"]
 
