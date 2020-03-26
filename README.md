@@ -2,7 +2,7 @@
 
 Clone This Project (Make Sure You Have Git Installed)
 ```
-git remote add origin https://github.com/AKrShukla/mobstac-sample.git
+git clone https://github.com/AKrShukla/mobstac-sample.git
 ```
 Install Dependencies 
 
